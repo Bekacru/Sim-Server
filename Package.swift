@@ -8,11 +8,13 @@ let package = Package(
   products: [
     .library(
       name: "Sim",
-      targets: ["Sim"])
+      targets: ["Sim"]),
+    .executable(name: "Example", targets: ["Example"]),
   ],
   targets: [
     .target(
       name: "Sim"),
+    .executableTarget(name: "Example", dependencies: ["Sim"]),
     .testTarget(
       name: "SimTests",
       dependencies: ["Sim"]),

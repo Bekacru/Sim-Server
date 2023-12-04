@@ -8,10 +8,31 @@ func parseRequest(_ input: String) -> Request {
   return Request(method: method, path: path)
 }
 
-func readData(from socket: Int32, into buffer: UnsafeMutableRawPointer, maxLength: Int) -> Int {
-  let bytesRead = read(socket, buffer, maxLength)
-  if bytesRead < 0 {
-    perror("read error")
+func readData(from socket: Int32, into buffer: UnsafeMutableRawPointer, maxLength: Int) async -> Int
+{
+  if #available(macOS 10.15, *) {
+    return await withUnsafeContinuation { continuation in
+      DispatchQueue.global().async {
+        let bytesRead = read(socket, buffer, maxLength)
+        if bytesRead < 0 {
+          perror("read error")
+        }
+        continuation.resume(returning: bytesRead)
+      }
+    }
+  } else {
+    let bytesRead = read(socket, buffer, maxLength)
+    if bytesRead < 0 {
+      perror("read error")
+    }
+    return bytesRead
   }
-  return bytesRead
+}
+
+typealias SignalHandler = @convention(c) (Int32) -> Void
+
+func handleSignal(sig: Int32) {
+  print("Server is shutting down...")
+
+  exit(0)
 }

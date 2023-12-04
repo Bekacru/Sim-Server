@@ -1,10 +1,4 @@
-# Sim Server
-
-A toy web server written in swift.
-
-## Usage
-
-```swift
+import Foundation
 import Sim
 
 var app = Server()
@@ -29,5 +23,3 @@ do {
 } catch {
   print("Error serving: \(error)")
 }
-
-```

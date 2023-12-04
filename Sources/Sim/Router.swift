@@ -1,10 +1,10 @@
 import Foundation
 
-enum Method {
+public enum Method {
   case GET, POST
 }
 
-enum Status: Equatable {
+public enum Status: Equatable {
   case ok
   case badRequest
   case unauthorized
@@ -37,37 +37,46 @@ enum Status: Equatable {
   }
 }
 
-struct Request {
-  let method: Method
-  let path: String
-  var param: [String: String] = [:]
+public struct Request {
+  public let method: Method
+  public let path: String
+  public var param: [String: String]
+  public init(method: Method, path: String, param: [String: String] = [:]) {
+    self.method = method
+    self.path = path
+    self.param = param
+  }
 }
 
-struct Response {
-  let body: String
-  let status: Status
+public struct Response {
+  public let body: String
+  public let status: Status
+  public init(body: String, status: Status) {
+    self.body = body
+    self.status = status
+  }
 }
 
-struct Route {
-  let path: String
-  let method: Method
-  let handler: (_ req: Request) -> Response
+public struct Route {
+  public let path: String
+  public let method: Method
+  public let handler: (_ req: Request) async -> Response
 }
 
-struct Router {
-  var routes: [Route] = []
-
-  mutating func get(_ path: String, handler: @escaping (Request) -> Response) {
+//Router Implementation
+extension Server {
+  public mutating func get(_ path: String, handler: @escaping (Request) async -> Response) {
     let route = Route(path: path, method: .GET, handler: handler)
     routes.append(route)
   }
 
-  mutating func post(_ path: String, handler: @escaping (Request) -> Response) {
+  public mutating func post(_ path: String, handler: @escaping (Request) async -> Response) {
     let route = Route(path: path, method: .POST, handler: handler)
     routes.append(route)
   }
 
-  func handle(req: Request) -> Response {
+  public func handle(req: Request) async -> Response {
+    print(req.path, routes.count)
     var route: Route? = nil
     var request = req
     for r in routes {
@@ -75,7 +84,8 @@ struct Router {
         route = r
         break
       }
-      //Dynamic Routes
+
+      // Dynamic Routes
       let regexPattern = "\\[[a-zA-Z]+\\]"
       do {
         let regex = try NSRegularExpression(pattern: regexPattern, options: [])
@@ -86,8 +96,7 @@ struct Router {
           let matchedString = String(r.path[matchRange]).replacingOccurrences(of: "[", with: "")
             .replacingOccurrences(of: "]", with: "")
           let staticPath = r.path.components(separatedBy: "[")[0]
-          let requestPath =
-            req.path.components(separatedBy: "/")
+          let requestPath = req.path.components(separatedBy: "/")
           let staticReqPath = "/" + requestPath.dropLast().joined(separator: "/")
           let dynamicParam = requestPath.last!
           if staticPath == staticReqPath {
@@ -100,8 +109,9 @@ struct Router {
         print("Error creating regex: \(error)")
       }
     }
-    if let route {
-      return route.handler(request)
+
+    if let route = route {
+      return await route.handler(request)
     } else {
       let html =
         "<!DOCTYPE html><html><body style='text-align:center;'><h1>Not Found.</h1></body></html>"

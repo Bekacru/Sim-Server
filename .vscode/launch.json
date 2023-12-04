@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "sourceLanguages": ["swift"],
+      "args": [],
+      "cwd": "${workspaceFolder:Sim-Server}",
+      "name": "Debug Example",
+      "program": "${workspaceFolder:Sim-Server}/.build/debug/Example",
+      "preLaunchTask": "swift: Build Debug Example"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "sourceLanguages": ["swift"],
+      "args": [],
+      "cwd": "${workspaceFolder:Sim-Server}",
+      "name": "Release Example",
+      "program": "${workspaceFolder:Sim-Server}/.build/release/Example",
+      "preLaunchTask": "swift: Build Release Example"
+    }
+  ]
+}
