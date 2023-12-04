@@ -15,7 +15,7 @@ public struct Server {
 
   public func serve(
     port: Int = 3000,
-    backlogSize: Int32 = 1_000_000,
+    backlogSize: Int32 = 1000,
     _ onListen: (_ port: Int) async -> Void = { print("Server Listening on port \($0)") }
   ) async throws {
     let portNumber = UInt16(port)
@@ -61,7 +61,6 @@ public struct Server {
       if let receivedString = String(data: receivedData, encoding: .utf8) {
         let req = parseRequest(receivedString)
         let res = await handle(req: req)
-        print(res)
         let responseString: String = """
           HTTP/1.1 \(res.status.rawValue) \(res.status.description)
           server: sim-server

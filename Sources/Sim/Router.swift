@@ -76,7 +76,6 @@ extension Server {
   }
 
   public func handle(req: Request) async -> Response {
-    print(req.path, routes.count)
     var route: Route? = nil
     var request = req
     for r in routes {
@@ -84,7 +83,6 @@ extension Server {
         route = r
         break
       }
-
       // Dynamic Routes
       let regexPattern = "\\[[a-zA-Z]+\\]"
       do {

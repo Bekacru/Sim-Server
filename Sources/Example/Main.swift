@@ -1,4 +1,3 @@
-import Foundation
 import Sim
 
 var app = Server()
@@ -19,7 +18,10 @@ app.get("/[id]") {
 }
 
 do {
-  try await app.serve()
+  try await app.serve(port: 3000) {
+    port in
+    print("Server listening in port \(port)")
+  }
 } catch {
   print("Error serving: \(error)")
 }
